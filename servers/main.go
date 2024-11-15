@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	var handlerFunc http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, r.URL.String())
+	}
+
+	http.HandleFunc("/url/", handlerFunc)
+	
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Customer service")
 	})

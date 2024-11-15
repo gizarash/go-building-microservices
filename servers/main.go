@@ -8,15 +8,17 @@ import (
 )
 
 func main() {
+	http.Handle("/", myHandler("Customer service"))
+
 	var handlerFunc http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, r.URL.String())
 	}
 
 	http.HandleFunc("/url/", handlerFunc)
-	
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Customer service")
-	})
+
+	// http.HandleFunc("/service/", func(w http.ResponseWriter, r *http.Request) {
+	// 	fmt.Fprintln(w, "Customer service")
+	// })
 
 	s := http.Server{
 		Addr: ":3000",
@@ -25,7 +27,7 @@ func main() {
 	// run the following command
 	// go run 'C:\Program Files\Go\src\crypto\tls\generate_cert.go' --host localhost
 	// to generate selfsigned cert.pem and key.pem for localhost
-	go func(){
+	go func() {
 		log.Fatal(s.ListenAndServeTLS("./cert.pem", "./key.pem"))
 	}()
 
@@ -33,4 +35,10 @@ func main() {
 	fmt.Scanln()
 	s.Shutdown(context.Background())
 	fmt.Println("Server stopped")
+}
+
+type myHandler string
+
+func (mh myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, string(mh))
 }

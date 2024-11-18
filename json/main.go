@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/csv"
 	"encoding/json"
@@ -10,9 +11,37 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
+
+	http.HandleFunc("/customers/add", func(w http.ResponseWriter, r *http.Request) {
+		var c Customer
+		dec := json.NewDecoder(r.Body)
+		err := dec.Decode(&c)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		log.Print(c)
+	})
+
+	// test function to send JSON to our endpoint "/customers/add"
+	go func() {
+		time.Sleep(2 * time.Second)
+		_, err := http.Post("http://localhost:3000/customers/add", 
+		"application/json", bytes.NewBuffer([]byte(`
+			{
+				"id":	999,
+				"firstName":	"John",
+				"lastName":	"Doe",
+				"address":	"155 Country Lane, Cottington, England"
+			}
+		`)))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	http.HandleFunc("/customers", func(w http.ResponseWriter, r *http.Request) {
 		customers, err := readCustomers()

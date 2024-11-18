@@ -49,10 +49,10 @@ func main() {
 }
 
 type Customer struct {
-	ID        int
-	FirstName string
-	LastName  string
-	Address   string
+	ID        int    `json:"id"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Address   string `json:"address"`
 }
 
 func readCustomers() ([]Customer, error) {

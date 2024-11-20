@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Product struct {
@@ -29,14 +30,18 @@ func main() {
 		w.Write(data)
 	})
 
-	// http://localhost:4000/products/?id=1
+	// http://localhost:4000/products/1
 	http.HandleFunc("/products/", func(w http.ResponseWriter, r *http.Request) {
-		idRaw := r.URL.Query().Get("id")
-		id, err := strconv.Atoi(idRaw)
+		parts := strings.Split(r.URL.Path, "/") // [ "" "products" "1" ]
+		if len(parts) != 3 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		id, err := strconv.Atoi(parts[2])
 		if err != nil {
 			log.Print(err)
-			w.WriteHeader(http.StatusNotFound)
-			return
+					w.WriteHeader(http.StatusBadRequest)
+					return
 		}
 
 		for _, p := range products {
